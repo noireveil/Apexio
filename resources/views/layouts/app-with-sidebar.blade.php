@@ -63,23 +63,25 @@
                         <div class="mt-2"></div>
 
                         @php 
-                            $userProjects = Auth::user()->projects()->latest()->take(10)->get();
+                            $userProjects = Auth::user()->projects()->latest()->get();
                             $colors = ['#3b82f6', '#f97316', '#22c55e', '#a855f7', '#ec4899', '#eab308', '#06b6d4'];
                         @endphp
 
-                        @forelse($userProjects as $index => $proj)
-                            @php
-                                $isActive = request()->routeIs('project.detail') && request()->route('project')->id == $proj->id;
-                                $dotColor = $colors[$index % count($colors)];
-                            @endphp
-                            
-                            <a href="{{ route('project.detail', $proj) }}" class="nav-link {{ $isActive ? 'active' : '' }}">
-                                <span class="project-dot" style="background-color: {{ $dotColor }};"></span>
-                                <span class="text-truncate">{{ $proj->name }}</span>
-                            </a>
-                        @empty
-                            <div class="px-3 py-2 text-muted small fst-italic" style="font-size: 0.8rem;">No projects yet</div>
-                        @endforelse
+                        <div style="max-height: 300px; overflow-y: auto; overflow-x: hidden;" class="pe-1">
+                            @forelse($userProjects as $index => $proj)
+                                @php
+                                    $isActive = request()->routeIs('project.detail') && request()->route('project')->id == $proj->id;
+                                    $dotColor = $colors[$index % count($colors)];
+                                @endphp
+                                
+                                <a href="{{ route('project.detail', $proj) }}" class="nav-link {{ $isActive ? 'active' : '' }}">
+                                    <span class="project-dot" style="background-color: {{ $dotColor }};"></span>
+                                    <span class="text-truncate" title="{{ $proj->name }}">{{ $proj->name }}</span>
+                                </a>
+                            @empty
+                                <div class="px-3 py-2 text-muted small fst-italic" style="font-size: 0.8rem;">No projects yet</div>
+                            @endforelse
+                        </div>
                     </div>
                 @endif
             </div>

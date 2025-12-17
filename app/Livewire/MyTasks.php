@@ -12,6 +12,8 @@ class MyTasks extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     #[Layout('layouts.app-with-sidebar')] 
     public function render()
     {

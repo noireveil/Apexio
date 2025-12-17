@@ -3,58 +3,33 @@
 namespace App\Livewire;
 
 use App\Models\Project;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 class ManageProjects extends Component
 {
-    public Collection $projects;
-    public string $name = '';
-    public ?string $description = null;
+    public $name;
+    public $description;
+    public $is_active = true;
 
-    protected $rules = [
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string|max:65535',
-    ];
+    protected $listeners = ['project-created' => '$refresh', 'project-deleted' => '$refresh'];
 
-    public function mount(): void
+    public function render()
     {
-        $this->loadProjects();
+        return view('livewire.manage-projects', [
+            'projects' => Auth::user()->projects()->latest()->get()
+        ]);
     }
 
-    public function render(): View
+    public function deleteProject($projectId)
     {
-        return view('livewire.manage-projects');
-    }
+        $project = Project::findOrFail($projectId);
 
-    public function openCreateModal(): void
-    {
-        $this->reset(['name', 'description']);
-        $this->dispatch('open-create-modal'); 
-    }
-
-    public function saveProject(): void
-    {
-        $validatedData = $this->validate();
-        $user = Auth::user();
-
-        $project = $user->ownedProjects()->create($validatedData);
-
-        // Make creator an admin automatically
-        $user->projects()->attach($project->id, ['role' => 'Admin']);
-
-        $this->loadProjects();
-        $this->dispatch('close-create-modal');
-    }
-
-    public function deleteProject(Project $project): void
-    {
         $this->authorize('delete', $project);
 
         $project->delete();
-        $this->loadProjects();
+        
+        $this->dispatch('project-deleted'); 
     }
 
     private function loadProjects(): void

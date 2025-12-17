@@ -5,16 +5,16 @@ namespace App\Livewire;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class ProjectMembers extends Component
 {
     public Project $project;
-    public Collection $members;
     public string $email = '';
     public bool $canManageMembers = false;
+
+    protected $listeners = ['member-updated' => '$refresh'];
 
     protected function rules(): array
     {
@@ -23,47 +23,63 @@ class ProjectMembers extends Component
         ];
     }
 
-    protected function messages(): array
-    {
-        return [
-            'email.exists' => 'User with that email not found.',
-        ];
-    }
-
     public function mount(Project $project): void
     {
         $this->project = $project;
-        $this->loadMembers();
-
         $this->canManageMembers = Auth::user()->can('update', $this->project);
     }
 
     public function render(): View
     {
-        return view('livewire.project-members');
+        $members = $this->project->members()
+            ->withPivot('role')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view('livewire.project-members', [
+            'members' => $members
+        ]);
     }
 
     public function addMember(): void
     {
         $this->authorize('update', $this->project);
+        $this->validate();
 
-        $validatedData = $this->validate();
-        $userToAdd = User::where('email', $validatedData['email'])->first();
+        $user = User::where('email', $this->email)->first();
 
-        // Check if already a member
-        if ($this->project->members()->where('user_id', $userToAdd->id)->exists()) {
-            $this->addError('email', 'This user is already a member.');
+        if ($this->project->members()->where('user_id', $user->id)->exists() || $user->id === $this->project->owner_id) {
+            $this->addError('email', 'User is already a member or is the owner.');
             return;
         }
 
-        $this->project->members()->attach($userToAdd->id, ['role' => 'Member']);
+        $this->project->members()->attach($user->id, ['role' => 'Member']);
 
-        $this->loadMembers();
         $this->reset('email');
+        $this->dispatch('member-updated');
     }
 
-    private function loadMembers(): void
+    public function updateRole($userId, $role)
     {
-        $this->members = $this->project->members()->withPivot('role')->get();
+        $this->authorize('update', $this->project);
+
+        if (!in_array($role, ['Admin', 'Member'])) return;
+        
+        if ($userId === $this->project->owner_id) return;
+
+        $this->project->members()->updateExistingPivot($userId, ['role' => $role]);
+        $this->dispatch('member-updated');
+    }
+
+    public function removeMember($userId)
+    {
+        $this->authorize('update', $this->project);
+
+        if ($userId === $this->project->owner_id) return;
+        
+        if ($userId === Auth::id()) return;
+
+        $this->project->members()->detach($userId);
+        $this->dispatch('member-updated');
     }
 }

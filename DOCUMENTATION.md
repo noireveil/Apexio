@@ -1,94 +1,186 @@
-# Technical Documentation: Apexio
+# Apexio Technical Documentation & Architecture Guide
 
-This document details the technical architecture, implementation logic, and security protocols of the **Apexio** application.
-
----
-
-## 1. System Architecture
-
-The project adopts a **Modern Monolith** architecture using **Laravel 11** and **Livewire 3**, focusing on clean code and modularity.
-
-* **Backend Framework:** Laravel 11 (PHP 8.2+).
-* **Frontend Interactivity:** Livewire 3 + Alpine.js.
-* **Styling Architecture:** Modular SCSS (Bootstrap 5 based).
-    * `_base.scss`: Global resets and variables.
-    * `components/`: Specific styles for Kanban, Sidebar, Profile, etc.
-* **JavaScript Logic:** Separated ES6 modules in `resources/js/` (No inline JS).
+**Document Version:** 1.1.0  
+**Date:** December 17, 2025  
+**Author:** Muhammad Yasyfi Alhafizh
 
 ---
 
-## 2. Database Schema Highlights
+## Table of Contents
 
-The application relies on a relational database (MySQL/MariaDB). Key schema design decisions include:
-
-### Table `users`
-* **`is_admin` (boolean):** Determines global access rights (Super Admin vs Regular User).
-* **`avatar_path` (string|null):** Stores the file path of the uploaded profile photo.
-    * *Logic:* Accessor `getAvatarUrlAttribute` handles the full URL generation. If null, the UI renders an "Initials" fallback.
-
-### Table `tasks`
-* **`due_date` (datetime):** Stores exact deadlines.
-    * *Reason:* Uses `DATETIME` instead of `DATE` to support precision for the "Real-time Due Date" feature.
-* **`priority` (enum):** Levels: `low`, `medium`, `high`, `critical`.
-* **`status` (enum):** States: `To-Do`, `In-Progress`, `Done`.
-
-### Table `projects` & `project_members`
-* **Many-to-Many Relationship:** Users can belong to multiple projects with specific roles via the pivot table.
+1. [Prologue: Philosophy & Architecture](#prologue-philosophy--architecture)
+2. [Chapter I: The Entities (Models & Database)](#chapter-i-the-entities-models--database)
+3. [Chapter II: The Gatekeeper (Authentication & Policies)](#chapter-ii-the-gatekeeper-authentication--policies)
+4. [Chapter III: The Heart of Interaction (Livewire Components)](#chapter-iii-the-heart-of-interaction-livewire-components)
+5. [Chapter IV: Aesthetics & Presentation (Bootstrap & SCSS)](#chapter-iv-aesthetics--presentation-bootstrap--scss)
+6. [Epilogue: Security Notes & Best Practices](#epilogue-security-notes--best-practices)
 
 ---
 
-## 3. Feature Implementation Details
+## Prologue: Philosophy & Architecture
 
-### A. Interactive Kanban Board (Drag & Drop)
-* **Library:** Integrated **SortableJS** for smooth drag-and-drop interactions.
-* **Synchronization:**
-    * Frontend events trigger Livewire methods (`updateTaskStatus`) to persist changes.
-    * Uses `Livewire.hook('commit')` to re-initialize JS logic after DOM updates, preventing UI flicker/glitches.
-* **Visual Logic:** CSS classes (`js-draggable-task`) enforce visual limits. Users cannot drag cards they do not own or have permission to move.
+Welcome to the world of Apexio. This application is not merely a collection of code, but rather an ecosystem for project management built upon the foundation of Laravel & Livewire combined with the robustness of Bootstrap 5.
 
-### B. Real-time Due Date System
-Solves the timezone discrepancy between Server (UTC) and Client (Local Time).
-* **Server Side:** Sends date strings in **ISO 8601** format (e.g., `2025-11-25T15:30:00+07:00`) via HTML data attributes.
-* **Client Side (JS):** A background script (`kanban.js`) runs every 10 seconds to parse these ISO strings into the user's local browser time.
-* **Dynamic Badges:** Automatically updates CSS classes to `.overdue` (Red) or `.due-soon` (Orange) in real-time without page reload.
+Unlike the TALL Stack trend that uses Tailwind, Apexio chooses the path of **Classic Stability**. We use Bootstrap managed through SCSS to ensure consistent design, a solid grid system, and mature UI components.
 
-### C. Super Admin Dashboard & Online Tracker
-* **Access Control:** Protected by strict checks: `if (!Auth::user()->is_admin) abort(403)`.
-* **Online Status Tracker:**
-    * Implemented via a custom Middleware (`TrackUserActivity`).
-    * Updates a Cache key (`user-is-online-{id}`) with a 2-minute expiration on every request.
-    * The UI checks this Cache key to display the Green (Online) or Grey (Offline) indicator.
-* **User Management:** Admin can reset passwords to default (`password123`), toggle Admin status, and delete users via Livewire actions.
-
-### D. "My Tasks" Aggregation
-* **Purpose:** A centralized view for users to see all their responsibilities across multiple projects.
-* **Query Logic:** Filters `tasks` where `assignee_id` matches the current user AND `status != Done`.
-* **Sorting:** Automatically ordered by `due_date` ascending (Urgent tasks first).
-* **Reusability:** Reuses the "Smart Badge" logic from Kanban for consistent real-time status indicators.
-
-### E. User Profile & Avatar
-* **Preview Logic:** Uses JavaScript `FileReader` API (`profile.js`) to show instant image previews before upload.
-* **Fallback UI:** Blade logic determines whether to render an `<img>` tag (if photo exists) or a `<div>` with initials (if null).
+The core philosophy of this codebase is **Reactivity Without Compromise**. We avoid traditional page reloads as much as possible. Nearly all dynamic interactions—from creating projects, inviting team members, to dragging task cards—are handled by Livewire, which acts as a seamless bridge between the browser and server, while Bootstrap JS handles micro-interactions such as Modals and Dropdowns.
 
 ---
 
-## 4. Security & Authorization
+## Chapter I: The Entities (Models & Database)
 
-Access control is enforced at multiple layers (Backend & Frontend):
+Within the Apexio data universe, there are four main entities that interact with each other. They reside in `app/Models`.
 
-1.  **Role-Based Access Control (RBAC):**
-    * **Super Admin:** Has global access (`is_admin = 1`). Can access `/admin` routes and manage all users.
-    * **Regular User:** Restricted to their own Projects and Tasks. The Admin menu is hidden from the Sidebar.
+### 1. The Creator: User
 
-2.  **Task Ownership Policy:**
-    * Users can only **move/edit** tasks if:
-        * They are the **Assignee**.
-        * OR the task is **Unassigned**.
-        * OR they are the **Admin** (Project Owner/Super Admin).
-    * **Frontend Enforcement:** Unauthorized tasks have `pointer-events: none` and `cursor: not-allowed`.
-    * **Backend Enforcement:** The `updateTaskStatus` method verifies ownership before saving changes to prevent IDOR (Insecure Direct Object Reference) attacks.
+Everything begins with the User. This model inherits from Laravel's `Authenticatable`.
 
-3.  **Middleware Protection:**
-    * `auth`: Ensures user is logged in.
-    * `verified`: Ensures email is verified (if enabled).
-    * `TrackUserActivity`: Monitors session activity for the online status feature.
+- **Identity:** Contains name, email, password, and the `avatar_path` attribute for storing profile photos.
+- **Role:** Has an `is_admin` attribute to distinguish Super Admins (system rulers) from regular users.
+- **Relations:** A User can own many Projects (`projects()`) and can be a member of many other projects (`belongsToMany` via pivot).
+
+### 2. The Container: Project
+
+Project is the gravitational center.
+
+- **Ownership:** Each project has one absolute Owner recorded in the `owner_id` column. This is an immutable law. Only the Owner can destroy this project.
+- **Lifecycle (The Cycle of Life):** In the `booted()` method, cleanup logic exists. If a Project is deleted (`deleting`), then automatically:
+  - All tasks within it will be destroyed.
+  - All membership relationships (`members`) will be detached. This prevents orphaned data in the database.
+
+### 3. The Work Unit: Task
+
+Task is the smallest atom of work.
+
+- **Attributes:** Has status (Todo, In Progress, Done), priority (Low, Medium, High), and `due_date`.
+- **Position:** Contains a `position` (or `order`) column crucial for the Drag & Drop feature in the Kanban board.
+
+### 4. The Connector: ProjectMember (Pivot)
+
+Although there is no explicit Model (using `belongsToMany` in User & Project), the `project_members` pivot table is where team hierarchy is determined.
+
+- **Role:** The `role` column in this table determines whether a member is an Admin (deputy) or Member (regular citizen).
+
+---
+
+## Chapter II: The Gatekeeper (Authentication & Policies)
+
+Security in Apexio is not merely an additional feature, but a fortified wall.
+
+### Authentication (Auth Controller)
+
+We use a modified starter kit (similar to Breeze). Authentication controllers are located in `app/Http/Controllers/Auth`.
+
+### Authorization (Policies)
+
+This is where the law is enforced. Located in `app/Policies`.
+
+#### ProjectPolicy.php - The Project Constitution
+
+This is the most sacred file in access management.
+
+- **View:** Who can view a project? Only the Owner OR those registered in the `project_members` table.
+- **Update:** Who can edit a project (change name, add members)?
+  - Owner (`owner_id`): Yes.
+  - Project Admin (User with 'Admin' role in pivot): Yes.
+  - Regular Member: NO.
+- **Delete (The Death Clause):** Who can delete a project?
+  - ONLY THE OWNER (`$user->id === $project->owner_id`).
+  - Project Admins DO NOT have this power. This is an absolute security feature to prevent "coups."
+
+#### TaskPolicy.php
+
+Governs who can move task cards around. The logic is similar to ProjectPolicy, but more flexible to allow collaboration.
+
+---
+
+## Chapter III: The Heart of Interaction (Livewire Components)
+
+This is where the "magic" of this application lies. `app/Livewire` is where frontend meets backend in real-time.
+
+### Project Management & Dashboard
+
+**Files:** `ManageProjects.php` & `AdminDashboard.php`
+
+The `ManageProjects` component is responsible for displaying the project list in the sidebar and main dashboard.
+
+- **Query Logic:** Retrieves projects based on `latest()`.
+- **Delete Security:** The `deleteProject($id)` function performs double-checking here. Even though the delete button is hidden in the UI, the backend still performs `$this->authorize('delete', $project)` to reject illegal requests (Inspect Element attacks).
+
+### Membership & Roles (The Member Logic)
+
+**Files:** `ProjectMembers.php` (Backend) & `project-members.blade.php` (Frontend)
+
+This is the most complex component in terms of social logic.
+
+#### Problems & Technical Solutions:
+
+**Hydration Issue:** Initially, we stored the `$members` collection as a public property. This was fatal! When Livewire re-renders, pivot data (role) often disappeared.
+
+- **Solution:** We retrieve member data (`$this->project->members()->withPivot('role')...`) directly in the `render()` method.
+
+**Coup Protection:**
+
+In the `updateRole` and `removeMember` functions, we insert a check: `if ($userId === $this->project->owner_id) return;`. The Owner cannot be demoted or kicked by anyone.
+
+**UI Glitch (Display Jumps):**
+
+When member status changes, the list often "flickers."
+
+- **Solution:** We added `wire:key="member-{{ $member->id }}"` to each loop element in Blade.
+
+**Badge Styling:**
+
+Uses inline styles on status badges (Admin/Owner) to ensure purple and gold colors appear with high contrast, overcoming the limitations of standard Bootstrap classes.
+
+### Kanban & Task List
+
+**Files:** `MyTasks.php`, `TaskList.php`
+
+Uses a sortable library that sends events to Livewire when cards are moved.
+
+Livewire captures the event, updates the status and position in the database, then broadcasts the change so the entire team sees the update instantly.
+
+---
+
+## Chapter IV: Aesthetics & Presentation (Bootstrap & SCSS)
+
+Apexio does not use utility-first CSS (Tailwind), but rather a component-based approach with compiled SCSS.
+
+### SCSS Structure (`resources/scss`):
+
+**app.scss:** The heart of the application's styling. This file imports the Bootstrap Framework in its entirety, giving us access to the grid system, modals, and utility classes.
+
+**_variables.scss:** Where we redefine Bootstrap variables (such as `$primary`, `$font-family`) to match the Apexio brand identity.
+
+### Modular Components:
+
+- **_sidebar.scss:** Specific styling for side navigation.
+- **_kanban.scss:** Manages horizontal workboard layout for smooth scrolling.
+- **_modal.scss & _forms.scss:** Override default Bootstrap styles for a more modern and clean appearance.
+
+### JavaScript Integration:
+
+The `resources/js/bootstrap.js` file is responsible for loading the Bootstrap 5 JS library and Axios, enabling interactive features like Modal Pop-ups and Dropdown menus to function without jQuery.
+
+---
+
+## Epilogue: Security Notes & Best Practices
+
+As a closing to this documentation, here are the "Security Mantras" applied in Apexio:
+
+### Trust No One
+Never trust input from the browser. Always validate on the backend (`$this->validate()`).
+
+### Verify Authority
+Don't just hide the "Delete" button. Ensure the backend function calls `$this->authorize()` before executing dangerous commands.
+
+### Owner is King
+Ensure code logic always distinguishes between `user_id` (pivot relation) and `owner_id` (actual owner in the `projects` table). Don't mix them up!
+
+### Clean Hydration
+For complex relational data (Pivot/HasMany), it's safer to retrieve it in `render()` rather than storing it in Livewire's public properties (`mount`).
+
+---
+
+This technical documentation has been created with care. May it serve as a guiding light for developers who continue the legacy of Apexio's codebase.

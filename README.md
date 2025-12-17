@@ -1,6 +1,18 @@
+<div align="center">
+
 # Apexio - Project Management System
 
-**Apexio** is a web-based project management application designed to facilitate efficient team collaboration. This application is built using **Laravel 11** and **Livewire 3**, adopting a *Modern Monolith* approach.
+![Status](https://img.shields.io/badge/Status-Completed-success?style=for-the-badge)
+![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Livewire](https://img.shields.io/badge/Livewire-3-4E56A6?style=for-the-badge&logo=livewire&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
+
+**Apexio** is a web-based project management application designed to facilitate efficient team collaboration. This application is built using **Laravel 11** and **Livewire 3**, adopting a *Modern Monolith* approach to deliver a seamless, reactive user experience without the complexity of a separate SPA.
+
+[📘 **Read Technical Documentation**](./DOCUMENTATION.md)
+
+</div>
 
 ---
 
@@ -41,11 +53,11 @@ Below is the main interface of Apexio, featuring the Sidebar and Kanban Board:
 
 ## 🛠️ Technology Stack
 
-* **Backend:** Laravel 11
-* **Frontend:** Livewire 3
-* **Styling:** Bootstrap 5 + SCSS (Custom)
+* **Backend:** Laravel 11 Framework
+* **Frontend Logic:** Livewire 3 (Full-stack reactivity)
+* **Styling:** Bootstrap 5 + Custom SCSS (Component-based architecture)
 * **Database:** MySQL / MariaDB
-* **Scripting:** Alpine.js + SortableJS
+* **Scripting:** Alpine.js (Micro-interactions) + SortableJS (Drag & Drop)
 
 ---
 
@@ -55,6 +67,7 @@ Ensure you have **PHP 8.2+**, **Composer**, and **Node.js** installed before sta
 
 ### 1. Initial Setup
 Run the following commands in your terminal (Command Prompt / Bash):
+
 ```bash
 # Clone the repository
 git clone https://github.com/noireveil/Apexio.git
@@ -72,6 +85,7 @@ php artisan key:generate
 ```
 
 ### 2. Database Configuration
+
 Open the `.env` file and adjust the database configuration (`DB_DATABASE=apexio`). Then follow the steps for your operating system:
 
 #### A. Windows Users (Laragon/XAMPP)
@@ -81,32 +95,38 @@ Open the `.env` file and adjust the database configuration (`DB_DATABASE=apexio`
 4. Ensure the `.env` file matches your credentials (Laragon default is usually user: `root`, password: empty).
 
 #### B. Linux Users (Terminal)
-1. Ensure the database service is running: `sudo systemctl start mariadb` (or `mysql`).
+1. Ensure the database service is running:
+   ```bash
+   sudo systemctl start mariadb  # or mysql
+   ```
 2. Login to MySQL and create the database:
-```bash
-mysql -u root -p -e "CREATE DATABASE apexio;"
-```
+   ```bash
+   mysql -u root -p -e "CREATE DATABASE apexio;"
+   ```
 3. Adjust the database username and password in the `.env` file if you use custom credentials.
 
 ### 3. Migration & Storage
+
 Once the database is ready, run the following commands in the project terminal to create tables and seed initial data:
+
 ```bash
 # Create tables and seed initial data (Seeder)
 php artisan migrate:fresh --seed
 
-# Create a shortcut so profile photos are publicly accessible (MANDATORY)
+# Create a symbolic link so profile photos are publicly accessible (MANDATORY)
 php artisan storage:link
 ```
 
 ### 4. Running the Application (IMPORTANT)
-This application requires two terminal processes running simultaneously for the Backend functions and Frontend styling to work.
 
-**Terminal 1 (Run Laravel Server):**
+This application requires **two terminal processes** running simultaneously for the Backend functions and Frontend styling to work.
+
+**Terminal 1** (Run Laravel Server):
 ```bash
 php artisan serve
 ```
 
-**Terminal 2 (Run Asset Compilation / Vite):**
+**Terminal 2** (Run Asset Compilation / Vite):
 ```bash
 npm run dev
 ```
@@ -121,7 +141,8 @@ To facilitate testing/grading, the application comes with pre-configured account
 
 | Role | Email | Password | Access Level |
 |------|-------|----------|--------------|
-| Super Admin | admin@apexio.com | password | Full System Access (Admin Dashboard) |
-| Regular User | user@apexio.com | password | Project Management Only |
+| **Super Admin** | admin@apexio.com | password | Full System Access (Admin Dashboard) |
+| **Regular User** | user@apexio.com | password | Project Management Only |
 
-**Note:** Run `php artisan migrate:fresh --seed` to generate these accounts.
+> **Note:** Run `php artisan migrate:fresh --seed` to generate these accounts.
+
