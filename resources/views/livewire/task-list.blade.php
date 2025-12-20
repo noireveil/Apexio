@@ -56,6 +56,13 @@
                                         {{ $task->title }}
                                     </h6>
 
+                                    @if($task->description)
+                                        <p class="text-muted small mb-2" 
+                                           style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.85rem;">
+                                            {{ $task->description }}
+                                        </p>
+                                    @endif
+
                                     <div class="asana-pill-container">
                                         @php
                                             $prioValue = $task->priority ?? 'medium';
@@ -105,20 +112,16 @@
                             {{-- Real-time Due Date Display --}}
                             @if($task->due_date)
                                 @php
-                                    // Calculate due status based on local time assumption
                                     $nowStr = now()->format('Y-m-d H:i:s');
                                     $dueStr = $task->due_date->format('Y-m-d H:i:s');
-                                    
                                     $isOverdue = $dueStr < $nowStr && $task->status !== 'Done';
                                     $diffHours = (strtotime($dueStr) - strtotime($nowStr)) / 3600;
                                     $isDueSoon = !$isOverdue && $diffHours <= 24 && $task->status !== 'Done';
-
                                     $initialClass = $isOverdue ? 'overdue' : ($isDueSoon ? 'due-soon' : '');
                                     $initialText = $isOverdue ? '(Late)' : ($isDueSoon ? '(Soon)' : '');
                                 @endphp
 
                                 <div class="mt-2 mb-2">
-                                    {{-- Use ISO format for JS parsing --}}
                                     <span class="badge-due-date js-due-date-badge {{ $initialClass }}" 
                                           title="{{ $task->due_date->format('d M Y H:i') }}"
                                           data-due-date="{{ $task->due_date->format('Y-m-d\TH:i:s') }}"

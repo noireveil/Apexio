@@ -16,15 +16,12 @@ class TaskList extends Component
     public Project $project;
     public Collection $members;
 
-    // Form Properties
     public string $title = '';
     public ?string $description = null;
     public ?int $assignee_id = null;
     public string $priority = 'medium';
     public string $status = 'To-Do';
     public ?string $due_date = null;
-
-    // Permissions
     public bool $canCreateTasks = false;
     public bool $canDeleteTasks = false; 
 
@@ -94,7 +91,6 @@ class TaskList extends Component
         $this->project->tasks()->create([
             'title' => $validatedData['title'],
             'description' => $validatedData['description'],
-            'user_id' => $validatedData['assignee_id'],
             'priority' => $validatedData['priority'],
             'status' => $validatedData['status'],
             'assignee_id' => $validatedData['assignee_id'],
@@ -117,10 +113,8 @@ class TaskList extends Component
 
         $task = Task::find($task_id);
         
-        // standard policy check
         $this->authorize('update', $task);
 
-        // Enforce ownership: only admins or the assignee can move the task
         if ($task->assignee_id && $task->assignee_id !== Auth::id() && !$this->canDeleteTasks) {
             $this->dispatch('task-notification', message: 'You can only move your own tasks!', type: 'error');
             return;

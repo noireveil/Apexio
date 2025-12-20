@@ -20,7 +20,7 @@
 
                 <h1 class="h3 fw-bold text-dark mb-1">{{ $project->name }}</h1>
                 <p class="text-muted small mb-0">
-                    {{ $project->description ?? 'Lorem Ipsum.' }}
+                    {{ $project->description ?? 'No description provided.' }}
                 </p>
             </div>
 

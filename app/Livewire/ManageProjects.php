@@ -21,6 +21,33 @@ class ManageProjects extends Component
         ]);
     }
 
+    public function openCreateModal()
+    {
+        $this->reset(['name', 'description']);
+        $this->dispatch('open-create-modal'); 
+    }
+
+    public function saveProject()
+    {
+        $this->validate([
+            'name' => 'required|min:3|max:255',
+            'description' => 'nullable|string'
+        ]);
+
+        $project = Project::create([
+            'owner_id' => Auth::id(),
+            'name' => $this->name,
+            'description' => $this->description,
+        ]);
+
+        $project->members()->attach(Auth::id(), ['role' => 'Admin']);
+
+        $this->reset(['name', 'description']);
+        $this->dispatch('close-create-modal');
+        
+        $this->dispatch('project-created');
+    }
+
     public function deleteProject($projectId)
     {
         $project = Project::findOrFail($projectId);
@@ -30,10 +57,5 @@ class ManageProjects extends Component
         $project->delete();
         
         $this->dispatch('project-deleted'); 
-    }
-
-    private function loadProjects(): void
-    {
-        $this->projects = Auth::user()->projects()->latest()->get();
     }
 }
