@@ -85,6 +85,7 @@ php artisan key:generate
 ```
 
 ### 2. Konfigurasi Database
+
 Buka file `.env` dan sesuaikan konfigurasi database (`DB_DATABASE=apexio`). Kemudian ikuti langkah-langkah sesuai sistem operasi Anda:
 
 #### A. Pengguna Windows (Laragon/XAMPP)
@@ -95,18 +96,19 @@ Buka file `.env` dan sesuaikan konfigurasi database (`DB_DATABASE=apexio`). Kemu
 
 #### B. Pengguna Linux (Terminal)
 1. Pastikan layanan database berjalan:
-```bash
-sudo systemctl start mariadb  # atau mysql
-```
+   ```bash
+   sudo systemctl start mariadb  # atau mysql
+   ```
 
 2. Login ke MySQL dan buat database:
-```bash
-mysql -u root -p -e "CREATE DATABASE apexio;"
-```
+   ```bash
+   mysql -u root -p -e "CREATE DATABASE apexio;"
+   ```
 
 3. Sesuaikan username dan password database di file `.env` jika Anda menggunakan kredensial custom.
 
 ### 3. Migrasi & Storage
+
 Setelah database siap, jalankan perintah berikut di terminal proyek untuk membuat tabel dan seed data demo masif:
 
 ```bash
@@ -118,6 +120,7 @@ php artisan storage:link
 ```
 
 ### 📧 Pengaturan Email (Fitur Lupa Password)
+
 Untuk menguji fungsionalitas "Lupa Password" (mengirim link reset via email), Anda harus mengkonfigurasi server SMTP. Cara termudah adalah menggunakan Gmail App Password:
 
 1. Buka Google Account Anda > Security.
@@ -146,12 +149,12 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 Aplikasi ini memerlukan dua proses terminal yang berjalan secara bersamaan.
 
-**Terminal 1 (Jalankan Laravel Server):**
+**Terminal 1** (Jalankan Laravel Server):
 ```bash
 php artisan serve
 ```
 
-**Terminal 2 (Jalankan Kompilasi Asset / Vite):**
+**Terminal 2** (Jalankan Kompilasi Asset / Vite):
 ```bash
 npm run dev
 ```
@@ -165,16 +168,96 @@ Akses aplikasi melalui browser di: **http://localhost:8000**
 Database seeder menghasilkan dataset masif (50 Proyek, ~600 Tugas, ~8.000 Komentar) untuk mensimulasikan lingkungan yang sibuk dan aktif.
 
 ### 1. Akses Admin (Untuk melihat data terisi)
+
 Gunakan akun ini untuk menjelajahi dashboard, mengelola pengguna, dan melihat aplikasi dengan data lengkap.
 
 | Peran | Email | Password | Deskripsi |
-|------|-------|----------|-----------|
+|-------|-------|----------|-----------|
 | Super Admin | admin@apexio.com | password | Akses Sistem Penuh & Tampilan Data Lengkap |
 
 ### 2. Pengujian Pengguna Reguler (Direkomendasikan)
+
 Seeder membuat 50 "pengguna dummy" acak untuk mengisi proyek, tetapi tidak membuat akun demo pengguna khusus untuk Anda.
 
-- **Untuk Menguji Registrasi:** Silakan gunakan fitur Register dengan alamat email pribadi Anda sendiri.
-- **Untuk Menguji Lupa Password:** Setelah mendaftar, logout dan gunakan link "Lupa password?". Pastikan Anda telah mengkonfigurasi file `.env` seperti yang dijelaskan di bagian "Pengaturan Email" di atas.
+* **Untuk Menguji Registrasi:** Silakan gunakan fitur Register dengan alamat email pribadi Anda sendiri.
+* **Untuk Menguji Lupa Password:** Setelah mendaftar, logout dan gunakan link "Lupa password?". Pastikan Anda telah mengkonfigurasi file `.env` seperti yang dijelaskan di bagian "Pengaturan Email" di atas.
 
 **Mengapa?** Ini memungkinkan Anda mengalami alur onboarding lengkap dan memverifikasi bahwa pengiriman email berfungsi dengan konfigurasi SMTP spesifik Anda.
+
+---
+
+## 📚 Dokumentasi API (PHPDoc)
+
+Source code proyek ini telah dilengkapi dengan komentar dokumentasi standar (DocBlocks). Dokumentasi API lengkap telah di-generate menggunakan PHPDocumentor dan tersedia dalam format HTML yang dapat diakses langsung melalui browser.
+
+### 🌐 Cara Mengakses Dokumentasi
+
+#### Metode 1: Buka Langsung di Browser (Paling Mudah)
+1. Navigasi ke folder `docs/api` di dalam direktori proyek Apexio
+2. Cari file `index.html`
+3. **Klik kanan** pada file `index.html` > **Open With** > Pilih browser favorit Anda (Chrome, Firefox, Edge, dll)
+4. Dokumentasi akan terbuka langsung di browser
+
+**Path lengkap:** `Apexio/docs/api/index.html`
+
+#### Metode 2: Menggunakan Live Server (VS Code)
+Jika Anda menggunakan Visual Studio Code, Anda dapat menggunakan ekstensi Live Server untuk pengalaman yang lebih baik:
+
+1. Install ekstensi **Live Server** dari Extensions Marketplace (jika belum terinstall)
+2. Buka folder `docs/api` di VS Code
+3. Klik kanan pada file `index.html`
+4. Pilih **"Open with Live Server"**
+5. Dokumentasi akan terbuka di browser dengan fitur auto-refresh
+
+**Keuntungan Live Server:**
+- Auto-reload saat ada perubahan
+- Local server dengan HTTP protocol proper
+- Lebih cepat untuk navigasi antar halaman
+
+#### Metode 3: HTTP Server Sederhana (Terminal)
+Anda juga bisa menggunakan built-in HTTP server dari PHP atau Python:
+
+**Menggunakan PHP:**
+```bash
+cd docs/api
+php -S localhost:8080
+```
+Kemudian buka browser dan akses: `http://localhost:8080`
+
+**Menggunakan Python:**
+```bash
+cd docs/api
+# Python 3
+python -m http.server 8080
+# atau Python 2
+python -m SimpleHTTPServer 8080
+```
+Kemudian buka browser dan akses: `http://localhost:8080`
+
+### 📖 Isi Dokumentasi
+
+Dokumentasi API mencakup:
+- **Struktur Kelas Lengkap:** Semua Model, Controller, Livewire Component, Middleware, dan Service Class
+- **Detail Method:** Parameter, return type, dan deskripsi fungsi untuk setiap method
+- **Relasi Database:** Dokumentasi relasi Eloquent (hasMany, belongsTo, dll)
+- **Namespace & Dependencies:** Struktur organisasi kode dan dependensinya
+- **Property & Attributes:** Dokumentasi lengkap untuk setiap property class
+
+### 🔍 Navigasi Dokumentasi
+
+Setelah membuka dokumentasi, Anda akan menemukan:
+- **Sidebar Kiri:** Daftar namespace dan class yang terorganisir
+- **Panel Utama:** Detail dokumentasi untuk class/method yang dipilih
+- **Search Box:** Fitur pencarian cepat untuk menemukan class atau method tertentu
+- **Index:** Daftar alfabetis dari semua elemen yang terdokumentasi
+
+**Catatan:** Dokumentasi ini bersifat **statis** (HTML/CSS/JS), sehingga dapat dibuka dan digunakan tanpa memerlukan server web aktif. Semua file berada di folder `docs/api` dan siap digunakan kapan saja.
+
+---
+
+## 📝 Catatan Penting
+
+* Pastikan kedua terminal (Laravel server dan Vite) tetap berjalan selama development
+* Jangan lupa menjalankan `php artisan storage:link` untuk akses foto profil
+* Untuk production, compile assets dengan `npm run build`
+* Database seeder akan mereset semua data yang ada, gunakan dengan hati-hati
