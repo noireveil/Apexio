@@ -1,186 +1,180 @@
-# Apexio Technical Documentation & Architecture Guide
+# Hikayat Teknis & Panduan Arsitektur Apexio
 
-**Document Version:** 1.1.0  
-**Date:** December 17, 2025  
-**Author:** Muhammad Yasyfi Alhafizh
-
----
-
-## Table of Contents
-
-1. [Prologue: Philosophy & Architecture](#prologue-philosophy--architecture)
-2. [Chapter I: The Entities (Models & Database)](#chapter-i-the-entities-models--database)
-3. [Chapter II: The Gatekeeper (Authentication & Policies)](#chapter-ii-the-gatekeeper-authentication--policies)
-4. [Chapter III: The Heart of Interaction (Livewire Components)](#chapter-iii-the-heart-of-interaction-livewire-components)
-5. [Chapter IV: Aesthetics & Presentation (Bootstrap & SCSS)](#chapter-iv-aesthetics--presentation-bootstrap--scss)
-6. [Epilogue: Security Notes & Best Practices](#epilogue-security-notes--best-practices)
+**Versi Dokumen:** 1.2.0 (Revisi Final)  
+**Tanggal Penulisan:** 17 Desember 2025  
+**Penulis:** Muhammad Yasyfi Alhafizh
 
 ---
 
-## Prologue: Philosophy & Architecture
+## Daftar Isi
 
-Welcome to the world of Apexio. This application is not merely a collection of code, but rather an ecosystem for project management built upon the foundation of Laravel & Livewire combined with the robustness of Bootstrap 5.
-
-Unlike the TALL Stack trend that uses Tailwind, Apexio chooses the path of **Classic Stability**. We use Bootstrap managed through SCSS to ensure consistent design, a solid grid system, and mature UI components.
-
-The core philosophy of this codebase is **Reactivity Without Compromise**. We avoid traditional page reloads as much as possible. Nearly all dynamic interactions—from creating projects, inviting team members, to dragging task cards—are handled by Livewire, which acts as a seamless bridge between the browser and server, while Bootstrap JS handles micro-interactions such as Modals and Dropdowns.
-
----
-
-## Chapter I: The Entities (Models & Database)
-
-Within the Apexio data universe, there are four main entities that interact with each other. They reside in `app/Models`.
-
-### 1. The Creator: User
-
-Everything begins with the User. This model inherits from Laravel's `Authenticatable`.
-
-- **Identity:** Contains name, email, password, and the `avatar_path` attribute for storing profile photos.
-- **Role:** Has an `is_admin` attribute to distinguish Super Admins (system rulers) from regular users.
-- **Relations:** A User can own many Projects (`projects()`) and can be a member of many other projects (`belongsToMany` via pivot).
-
-### 2. The Container: Project
-
-Project is the gravitational center.
-
-- **Ownership:** Each project has one absolute Owner recorded in the `owner_id` column. This is an immutable law. Only the Owner can destroy this project.
-- **Lifecycle (The Cycle of Life):** In the `booted()` method, cleanup logic exists. If a Project is deleted (`deleting`), then automatically:
-  - All tasks within it will be destroyed.
-  - All membership relationships (`members`) will be detached. This prevents orphaned data in the database.
-
-### 3. The Work Unit: Task
-
-Task is the smallest atom of work.
-
-- **Attributes:** Has status (Todo, In Progress, Done), priority (Low, Medium, High), and `due_date`.
-- **Position:** Contains a `position` (or `order`) column crucial for the Drag & Drop feature in the Kanban board.
-
-### 4. The Connector: ProjectMember (Pivot)
-
-Although there is no explicit Model (using `belongsToMany` in User & Project), the `project_members` pivot table is where team hierarchy is determined.
-
-- **Role:** The `role` column in this table determines whether a member is an Admin (deputy) or Member (regular citizen).
+1. [Prolog: Filosofi & Arsitektur](#prolog-filosofi--arsitektur)
+2. [Bab I: Para Tokoh (Model & Database)](#bab-i-para-tokoh-model--database)
+3. [Bab II: Sang Penjaga Gerbang (Authentication & Policies)](#bab-ii-sang-penjaga-gerbang-authentication--policies)
+4. [Bab III: Jantung Interaksi (Livewire Components)](#bab-iii-jantung-interaksi-livewire-components)
+5. [Bab IV: Estetika & Tampilan (Bootstrap & SCSS)](#bab-iv-estetika--tampilan-bootstrap--scss)
+6. [Epilog: Catatan Keamanan & Praktik Terbaik](#epilog-catatan-keamanan--praktik-terbaik)
 
 ---
 
-## Chapter II: The Gatekeeper (Authentication & Policies)
+## Prolog: Filosofi & Arsitektur
 
-Security in Apexio is not merely an additional feature, but a fortified wall.
+Selamat datang di dunia Apexio. Aplikasi ini bukan sekadar kumpulan kode, melainkan sebuah ekosistem manajemen proyek yang dibangun di atas pondasi **Laravel 11 & Livewire 3** yang dipadukan dengan ketangguhan **Bootstrap 5**.
+
+Berbeda dengan tren TALL Stack yang menggunakan Tailwind, Apexio memilih jalan **Kestabilan Klasik**. Kami menggunakan Bootstrap yang dikelola melalui SCSS untuk memastikan desain yang konsisten, grid yang kokoh, dan komponen UI yang matang.
+
+Filosofi utama kode ini adalah **Reaktivitas Tanpa Kompromi**. Kami menghindari page reload tradisional sebisa mungkin. Hampir seluruh interaksi dinamis—mulai dari membuat proyek, mengundang anggota tim, hingga menggeser kartu tugas—ditangani oleh Livewire, yang bertindak sebagai jembatan gaib antara browser dan server.
+
+---
+
+## Bab I: Para Tokoh (Model & Database)
+
+Di dalam semesta data Apexio, terdapat empat entitas utama yang saling berinteraksi. Mereka hidup di `app/Models`.
+
+### 1. Sang Pencipta: User
+
+Segala sesuatu bermula dari User. Model ini mewarisi `Authenticatable` dari Laravel.
+
+- **Identitas:** Memiliki nama, email, password, dan atribut `avatar_path` untuk menyimpan foto profil.
+- **Peran:** Memiliki atribut `is_admin` untuk membedakan Super Admin (penguasa sistem) dengan pengguna biasa.
+- **Relasi:** User bisa memiliki banyak Project (`projects()`) dan bisa menjadi anggota di banyak project lain (`belongsToMany` via pivot).
+
+### 2. Sang Wadah: Project
+
+Project adalah pusat gravitasi.
+
+- **Kepemilikan:** Setiap project memiliki satu Owner mutlak yang dicatat dalam kolom `owner_id`. Ini adalah hukum yang tidak bisa diganggu gugat. Hanya Owner yang bisa menghancurkan project ini.
+- **Siklus Hidup (The Cycle of Life):** Dalam method `booted()`, terdapat logika clean-up. Jika sebuah Project dihapus (`deleting`), maka secara otomatis:
+  - Semua tasks di dalamnya akan musnah.
+  - Semua hubungan keanggotaan (`members`) akan diputus (detach). Ini mencegah adanya data yatim piatu (orphan data) di database.
+
+### 3. Sang Unit Kerja: Task
+
+Task adalah atom terkecil dari pekerjaan.
+
+- **Atribut:** Memiliki status (Todo, In Progress, Done), priority (Low, Medium, High), dan `due_date`.
+- **Posisi:** Memiliki kolom `position` (atau `order`) yang krusial untuk fitur Drag & Drop di Kanban board.
+
+### 4. Sang Penghubung: ProjectMember (Pivot)
+
+Meskipun tidak memiliki Model eksplisit (menggunakan `belongsToMany` di User & Project), tabel pivot `project_members` adalah tempat di mana hierarki tim ditentukan.
+
+- **Role:** Kolom `role` di tabel ini menentukan apakah seorang member adalah Admin (wakil) atau Member (rakyat biasa).
+
+---
+
+## Bab II: Sang Penjaga Gerbang (Authentication & Policies)
+
+Keamanan di Apexio bukan sekadar fitur tambahan, melainkan dinding benteng yang kokoh.
 
 ### Authentication (Auth Controller)
 
-We use a modified starter kit (similar to Breeze). Authentication controllers are located in `app/Http/Controllers/Auth`.
+Kami menggunakan starter kit (mirip Breeze) yang telah dimodifikasi. Controller otentikasi terletak di `app/Http/Controllers/Auth`.
 
 ### Authorization (Policies)
 
-This is where the law is enforced. Located in `app/Policies`.
+Di sinilah hukum ditegakkan. Terletak di `app/Policies`.
 
-#### ProjectPolicy.php - The Project Constitution
+#### ProjectPolicy.php - Konstitusi Proyek
 
-This is the most sacred file in access management.
+Ini adalah file paling sakral dalam manajemen akses.
 
-- **View:** Who can view a project? Only the Owner OR those registered in the `project_members` table.
-- **Update:** Who can edit a project (change name, add members)?
-  - Owner (`owner_id`): Yes.
-  - Project Admin (User with 'Admin' role in pivot): Yes.
-  - Regular Member: NO.
-- **Delete (The Death Clause):** Who can delete a project?
-  - ONLY THE OWNER (`$user->id === $project->owner_id`).
-  - Project Admins DO NOT have this power. This is an absolute security feature to prevent "coups."
+- **View:** Siapa yang boleh melihat proyek? Hanya Owner ATAU mereka yang terdaftar di tabel `project_members`.
+- **Update:** Siapa yang boleh mengedit proyek (ganti nama, tambah member)?
+  - Owner (`owner_id`): Ya.
+  - Admin Project (User dengan role 'Admin' di pivot): Ya.
+  - Member biasa: TIDAK.
+- **Delete (Pasal Kematian):** Siapa yang boleh menghapus proyek?
+  - **HANYA OWNER** (`$user->id === $project->owner_id`).
+  - Admin Project TIDAK memiliki kuasa ini. Ini adalah fitur keamanan absolut untuk mencegah "kudeta".
 
 #### TaskPolicy.php
 
-Governs who can move task cards around. The logic is similar to ProjectPolicy, but more flexible to allow collaboration.
+Mengatur siapa yang boleh memindah-mindahkan kartu tugas. Logikanya mirip dengan ProjectPolicy, namun lebih luwes agar kolaborasi bisa terjadi.
 
 ---
 
-## Chapter III: The Heart of Interaction (Livewire Components)
+## Bab III: Jantung Interaksi (Livewire Components)
 
-This is where the "magic" of this application lies. `app/Livewire` is where frontend meets backend in real-time.
+Di sinilah letak "sihir" aplikasi ini. `app/Livewire` adalah tempat di mana frontend bertemu backend secara real-time.
 
-### Project Management & Dashboard
+### Manajemen Proyek & Logika Pembuatan
 
-**Files:** `ManageProjects.php` & `AdminDashboard.php`
+**File:** `ManageProjects.php` & `AdminDashboard.php`
 
-The `ManageProjects` component is responsible for displaying the project list in the sidebar and main dashboard.
+Komponen `ManageProjects` bertugas menampilkan daftar proyek di sidebar dan dashboard utama.
 
-- **Query Logic:** Retrieves projects based on `latest()`.
-- **Delete Security:** The `deleteProject($id)` function performs double-checking here. Even though the delete button is hidden in the UI, the backend still performs `$this->authorize('delete', $project)` to reject illegal requests (Inspect Element attacks).
+**Creation Logic (The Auto-Attach):**
 
-### Membership & Roles (The Member Logic)
+Saat proyek baru dibuat via `saveProject()`, sistem melakukan dua langkah transaksional:
 
-**Files:** `ProjectMembers.php` (Backend) & `project-members.blade.php` (Frontend)
+1. Membuat record Project dengan `owner_id`.
+2. Secara otomatis mendaftarkan (attach) Owner tersebut sebagai 'Admin' di tabel pivot `project_members`.
 
-This is the most complex component in terms of social logic.
+**Alasan:** Ini memperbaiki celah logika di mana owner tidak bisa melihat proyeknya sendiri di dashboard karena query utama bergantung pada tabel keanggotaan.
 
-#### Problems & Technical Solutions:
+**Keamanan Hapus:** Fungsi `deleteProject($id)` melakukan pengecekan ganda via `$this->authorize('delete', $project)` untuk menolak request ilegal.
 
-**Hydration Issue:** Initially, we stored the `$members` collection as a public property. This was fatal! When Livewire re-renders, pivot data (role) often disappeared.
+### Keanggotaan & Peran (The Member Logic)
 
-- **Solution:** We retrieve member data (`$this->project->members()->withPivot('role')...`) directly in the `render()` method.
+**File:** `ProjectMembers.php` (Backend) & `project-members.blade.php` (Frontend)
 
-**Coup Protection:**
+Ini adalah komponen yang paling kompleks secara logika sosial.
 
-In the `updateRole` and `removeMember` functions, we insert a check: `if ($userId === $this->project->owner_id) return;`. The Owner cannot be demoted or kicked by anyone.
-
-**UI Glitch (Display Jumps):**
-
-When member status changes, the list often "flickers."
-
-- **Solution:** We added `wire:key="member-{{ $member->id }}"` to each loop element in Blade.
-
-**Badge Styling:**
-
-Uses inline styles on status badges (Admin/Owner) to ensure purple and gold colors appear with high contrast, overcoming the limitations of standard Bootstrap classes.
+- **Proteksi Kudeta:** Di fungsi `updateRole` dan `removeMember`, terdapat pengecekan: `if ($userId === $this->project->owner_id) return;`. Owner tidak bisa diturunkan jabatannya atau di-kick oleh siapapun.
+- **Styling Badge:** Menggunakan Inline Style pada badge status (Admin/Owner) untuk memastikan warna ungu dan emas muncul dengan kontras tinggi.
 
 ### Kanban & Task List
 
-**Files:** `MyTasks.php`, `TaskList.php`
+**File:** `TaskList.php` (Logic) & `task-list.blade.php` (View)
 
-Uses a sortable library that sends events to Livewire when cards are moved.
+- Menggunakan perpustakaan sortable yang mengirimkan event ke Livewire saat kartu dipindah.
+- **Description Persistence:** Berbeda dengan desain awal, metode `saveTask()` kini secara eksplisit menangkap dan menyimpan field `description`.
+- **Visual Logic:** Tampilan kartu Kanban menggunakan CSS line-clamping (`-webkit-line-clamp: 2`) untuk menampilkan deskripsi tugas secara elegan tanpa merusak layout papan.
 
-Livewire captures the event, updates the status and position in the database, then broadcasts the change so the entire team sees the update instantly.
+### Personal Workspace (My Tasks)
 
----
+**File:** `MyTasks.php`
 
-## Chapter IV: Aesthetics & Presentation (Bootstrap & SCSS)
+Komponen ini menangani agregasi tugas dari seluruh proyek.
 
-Apexio does not use utility-first CSS (Tailwind), but rather a component-based approach with compiled SCSS.
+**The "Ghost Task" Prevention:**
 
-### SCSS Structure (`resources/scss`):
-
-**app.scss:** The heart of the application's styling. This file imports the Bootstrap Framework in its entirety, giving us access to the grid system, modals, and utility classes.
-
-**_variables.scss:** Where we redefine Bootstrap variables (such as `$primary`, `$font-family`) to match the Apexio brand identity.
-
-### Modular Components:
-
-- **_sidebar.scss:** Specific styling for side navigation.
-- **_kanban.scss:** Manages horizontal workboard layout for smooth scrolling.
-- **_modal.scss & _forms.scss:** Override default Bootstrap styles for a more modern and clean appearance.
-
-### JavaScript Integration:
-
-The `resources/js/bootstrap.js` file is responsible for loading the Bootstrap 5 JS library and Axios, enabling interactive features like Modal Pop-ups and Dropdown menus to function without jQuery.
+- **Masalah:** User yang sudah di-kick dari sebuah proyek masih bisa melihat tugas yang pernah diberikan kepadanya di halaman "My Tasks".
+- **Solusi:** Logika query diperketat. Sistem kini mengecek: `where('assignee_id', $user)` DAN `whereHas('project', ...)` untuk memastikan user tersebut masih menjadi anggota aktif atau pemilik dari proyek induk tugas tersebut.
 
 ---
 
-## Epilogue: Security Notes & Best Practices
+## Bab IV: Estetika & Tampilan (Bootstrap & SCSS)
 
-As a closing to this documentation, here are the "Security Mantras" applied in Apexio:
+Apexio tidak menggunakan CSS utility-first (Tailwind), melainkan pendekatan **Component-based** dengan SCSS yang terkompilasi.
 
-### Trust No One
-Never trust input from the browser. Always validate on the backend (`$this->validate()`).
+### Struktur SCSS (`resources/scss`):
 
-### Verify Authority
-Don't just hide the "Delete" button. Ensure the backend function calls `$this->authorize()` before executing dangerous commands.
+- **app.scss:** Jantung gaya aplikasi. File ini mengimpor Bootstrap Framework secara utuh, memberikan akses ke grid system, modal, dan utility classes.
+- **_variables.scss:** Tempat mendefinisikan ulang variabel Bootstrap (seperti `$primary`, `$font-family`) agar sesuai dengan identitas brand Apexio.
 
-### Owner is King
-Ensure code logic always distinguishes between `user_id` (pivot relation) and `owner_id` (actual owner in the `projects` table). Don't mix them up!
+### Integrasi JavaScript:
 
-### Clean Hydration
-For complex relational data (Pivot/HasMany), it's safer to retrieve it in `render()` rather than storing it in Livewire's public properties (`mount`).
+- **Bootstrap JS:** `resources/js/bootstrap.js` memuat library Bootstrap 5 JS dan Axios.
+- **Profile Modals:** Kami memigrasikan modal "Delete Account" dari Alpine.js ke **Native Bootstrap 5 Data Attributes** (`data-bs-toggle`). Ini menjamin keandalan tombol dan konsistensi tema, memperbaiki masalah di mana tombol seringkali tidak merespons.
 
 ---
 
-This technical documentation has been created with care. May it serve as a guiding light for developers who continue the legacy of Apexio's codebase.
+## Epilog: Catatan Keamanan & Praktik Terbaik
+
+Sebagai penutup dokumentasi ini, berikut adalah "Mantra Keamanan" yang diterapkan di Apexio:
+
+1. **Trust No One:** Jangan pernah percaya input dari browser. Selalu validasi di backend (`$this->validate()`).
+
+2. **Verify Authority:** Jangan hanya sembunyikan tombol "Hapus". Pastikan fungsi di backend memanggil `$this->authorize()` sebelum mengeksekusi perintah berbahaya.
+
+3. **Owner is King:** Pastikan logika kode selalu membedakan antara `user_id` (relasi pivot) dan `owner_id` (pemilik asli di tabel projects). Jangan sampai tertukar!
+
+4. **No Ghost Data:** Pastikan setiap query list memverifikasi status keanggotaan user saat ini, bukan hanya riwayat penugasan (`assignee`).
+
+---
+
+Demikianlah dokumentasi teknis ini dibuat. Semoga menjadi pelita bagi pengembang yang meneruskan warisan kode Apexio.
+
+**Akhir Dokumen**

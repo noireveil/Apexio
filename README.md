@@ -1,148 +1,180 @@
 <div align="center">
 
-# Apexio - Project Management System
+# Apexio - Sistem Manajemen Proyek
 
-![Status](https://img.shields.io/badge/Status-Completed-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Selesai-success?style=for-the-badge)
 ![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![Livewire](https://img.shields.io/badge/Livewire-3-4E56A6?style=for-the-badge&logo=livewire&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
 
-**Apexio** is a web-based project management application designed to facilitate efficient team collaboration. This application is built using **Laravel 11** and **Livewire 3**, adopting a *Modern Monolith* approach to deliver a seamless, reactive user experience without the complexity of a separate SPA.
+**Apexio** adalah aplikasi manajemen proyek berbasis web yang dirancang untuk memfasilitasi kolaborasi tim yang efisien. Aplikasi ini dibangun menggunakan **Laravel 11** dan **Livewire 3**, mengadopsi pendekatan *Modern Monolith* untuk memberikan pengalaman pengguna yang reaktif dan mulus tanpa kompleksitas SPA terpisah.
 
-[📘 **Read Technical Documentation**](./DOCUMENTATION.md)
+[📘 **Baca Dokumentasi Teknis**](./DOCUMENTATION.md)
 
 </div>
 
 ---
 
-## 📸 Application Interface
+## 📸 Tampilan Aplikasi
 
-Below is the main interface of Apexio, featuring the Sidebar and Kanban Board:
+Berikut adalah tampilan utama Apexio, menampilkan Sidebar dan Kanban Board:
 
 ![Dashboard & Kanban](./screenshots/kanban_and_sidebar.jpeg)
 
 ---
 
-## ✨ Key Features
+## ✨ Fitur Utama
 
-### 1. Advanced Task Management (Kanban)
-* **Drag & Drop Kanban:** Interactive board allowing users to move tasks between statuses (To-Do, In-Progress, Done) seamlessly using SortableJS.
-* **Real-time Due Dates:** Smart deadline system with auto-updating badges ("Soon" or "Late") based on local user time.
-* **Task Details:** Comprehensive card view with priority levels, assignees, and threaded discussions (comments).
+### 1. Manajemen Tugas Lanjutan (Kanban)
+* **Drag & Drop Kanban:** Papan interaktif yang memungkinkan pengguna memindahkan tugas antar status (To-Do, In-Progress, Done) dengan mulus menggunakan SortableJS.
+* **Tenggat Waktu Real-time:** Sistem deadline pintar dengan badge yang diperbarui otomatis ("Segera" atau "Terlambat") berdasarkan waktu lokal pengguna.
+* **Detail Tugas:** Tampilan kartu komprehensif dengan tingkat prioritas, assignee, dan diskusi berulir (komentar).
 
-### 2. Personal Workspace
-* **"My Tasks" Page:** A dedicated aggregation view displaying all tasks assigned to the current user across multiple projects, sorted by urgency.
-* **Navigation Sidebar:** A fixed, responsive sidebar with active state indicators and quick access to recent projects.
+### 2. Ruang Kerja Personal
+* **Halaman "Tugas Saya":** Tampilan agregasi khusus yang menampilkan semua tugas yang diberikan kepada pengguna saat ini di berbagai proyek, diurutkan berdasarkan urgensi.
+* **Sidebar Navigasi:** Sidebar tetap dan responsif dengan indikator status aktif dan akses cepat ke proyek terbaru.
 
-### 3. Administration & Security
-* **Super Admin Dashboard:** Exclusive panel for system oversight, featuring real-time statistics (Total Users, Projects, Active Tasks).
-* **User Management:** Admin tools to monitor user lists, view **Real-time Online Status**, reset passwords, and manage access roles.
-* **Role-Based Access Control (RBAC):** Strict authorization logic ensuring users can only modify their own tasks, while Admins have full oversight.
+### 3. Administrasi & Keamanan
+* **Dashboard Super Admin:** Panel eksklusif untuk pengawasan sistem, menampilkan statistik real-time (Total Pengguna, Proyek, Tugas Aktif).
+* **Manajemen Pengguna:** Alat admin untuk memantau daftar pengguna, melihat **Status Online Real-time**, mereset password, dan mengelola peran akses.
+* **Kontrol Akses Berbasis Peran (RBAC):** Logika otorisasi ketat yang memastikan pengguna hanya dapat memodifikasi tugas mereka sendiri, sementara Admin memiliki pengawasan penuh.
 
-### 4. User Profile & Settings
-* **Profile Management:** Users can update their details and upload profile photos with instant preview.
-* **Smart Avatars:** System automatically generates initial-based avatars for users without profile photos.
-* **Account Security:** Centralized settings for password updates and secure account deletion.
+### 4. Profil & Pengaturan Pengguna
+* **Manajemen Profil:** Pengguna dapat memperbarui detail mereka dan mengunggah foto profil dengan preview instan.
+* **Avatar Pintar:** Sistem secara otomatis menghasilkan avatar berbasis inisial untuk pengguna tanpa foto profil.
+* **Keamanan Akun:** Pengaturan terpusat untuk pembaruan password dan penghapusan akun yang aman.
 
-### 5. Modern UI/UX
-* **Responsive Layout:** Built with Flexbox and Bootstrap 5 + SCSS for a pixel-perfect experience on any screen size.
-* **Interactive Feedback:** Toast notifications and visual cues (cursor changes, loading states) for a smooth user experience.
+### 5. UI/UX Modern
+* **Layout Responsif:** Dibangun dengan Flexbox dan Bootstrap 5 + SCSS untuk pengalaman pixel-perfect di berbagai ukuran layar.
+* **Umpan Balik Interaktif:** Notifikasi toast dan isyarat visual (perubahan kursor, status loading) untuk pengalaman pengguna yang mulus.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Stack Teknologi
 
 * **Backend:** Laravel 11 Framework
-* **Frontend Logic:** Livewire 3 (Full-stack reactivity)
-* **Styling:** Bootstrap 5 + Custom SCSS (Component-based architecture)
+* **Logika Frontend:** Livewire 3 (Reaktivitas full-stack)
+* **Styling:** Bootstrap 5 + SCSS Custom (Arsitektur berbasis komponen)
 * **Database:** MySQL / MariaDB
-* **Scripting:** Alpine.js (Micro-interactions) + SortableJS (Drag & Drop)
+* **Scripting:** Alpine.js (Mikro-interaksi) + SortableJS (Drag & Drop)
 
 ---
 
-## 💻 Installation Guide
+## 💻 Panduan Instalasi
 
-Ensure you have **PHP 8.2+**, **Composer**, and **Node.js** installed before starting.
+Pastikan Anda telah menginstal **PHP 8.2+**, **Composer**, dan **Node.js** sebelum memulai.
 
-### 1. Initial Setup
-Run the following commands in your terminal (Command Prompt / Bash):
+### 1. Pengaturan Awal
+Jalankan perintah berikut di terminal Anda:
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/noireveil/Apexio.git
 cd Apexio
 
-# Install Backend & Frontend dependencies
+# Install dependensi Backend & Frontend
 composer install
 npm install
 
-# Duplicate environment configuration
+# Duplikat konfigurasi environment
 cp .env.example .env
 
 # Generate Application Key
 php artisan key:generate
 ```
 
-### 2. Database Configuration
+### 2. Konfigurasi Database
+Buka file `.env` dan sesuaikan konfigurasi database (`DB_DATABASE=apexio`). Kemudian ikuti langkah-langkah sesuai sistem operasi Anda:
 
-Open the `.env` file and adjust the database configuration (`DB_DATABASE=apexio`). Then follow the steps for your operating system:
+#### A. Pengguna Windows (Laragon/XAMPP)
+1. Pastikan Laragon/XAMPP berjalan (Start All).
+2. Buka HeidiSQL (Laragon) atau phpMyAdmin.
+3. Buat database baru dengan nama: `apexio`.
+4. Pastikan file `.env` sesuai dengan kredensial Anda (default Laragon biasanya user: `root`, password: kosong).
 
-#### A. Windows Users (Laragon/XAMPP)
-1. Ensure Laragon/XAMPP is running (Start All).
-2. Open HeidiSQL (Laragon) or phpMyAdmin.
-3. Create a new database named: `apexio`.
-4. Ensure the `.env` file matches your credentials (Laragon default is usually user: `root`, password: empty).
+#### B. Pengguna Linux (Terminal)
+1. Pastikan layanan database berjalan:
+```bash
+sudo systemctl start mariadb  # atau mysql
+```
 
-#### B. Linux Users (Terminal)
-1. Ensure the database service is running:
-   ```bash
-   sudo systemctl start mariadb  # or mysql
-   ```
-2. Login to MySQL and create the database:
-   ```bash
-   mysql -u root -p -e "CREATE DATABASE apexio;"
-   ```
-3. Adjust the database username and password in the `.env` file if you use custom credentials.
+2. Login ke MySQL dan buat database:
+```bash
+mysql -u root -p -e "CREATE DATABASE apexio;"
+```
 
-### 3. Migration & Storage
+3. Sesuaikan username dan password database di file `.env` jika Anda menggunakan kredensial custom.
 
-Once the database is ready, run the following commands in the project terminal to create tables and seed initial data:
+### 3. Migrasi & Storage
+Setelah database siap, jalankan perintah berikut di terminal proyek untuk membuat tabel dan seed data demo masif:
 
 ```bash
-# Create tables and seed initial data (Seeder)
+# Buat tabel dan seed data demo masif (50 Proyek, ~600 Tugas)
 php artisan migrate:fresh --seed
 
-# Create a symbolic link so profile photos are publicly accessible (MANDATORY)
+# Buat symbolic link agar foto profil dapat diakses secara publik (WAJIB)
 php artisan storage:link
 ```
 
-### 4. Running the Application (IMPORTANT)
+### 📧 Pengaturan Email (Fitur Lupa Password)
+Untuk menguji fungsionalitas "Lupa Password" (mengirim link reset via email), Anda harus mengkonfigurasi server SMTP. Cara termudah adalah menggunakan Gmail App Password:
 
-This application requires **two terminal processes** running simultaneously for the Backend functions and Frontend styling to work.
+1. Buka Google Account Anda > Security.
+2. Aktifkan 2-Step Verification (jika belum aktif).
+3. Cari "App Passwords".
+4. Buat app password baru (misalnya, beri nama "Apexio Local").
+5. Salin password 16 karakter yang dihasilkan.
+6. Buka file `.env` Anda dan perbarui bagian MAIL:
 
-**Terminal 1** (Run Laravel Server):
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=email_anda@gmail.com  # Alamat Gmail asli Anda
+MAIL_PASSWORD=xxxx xxxx xxxx xxxx   # App Password yang baru saja dibuat
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="no-reply@apexio.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+**Catatan:** Tanpa langkah ini, mencoba mereset password akan menghasilkan error koneksi.
+
+---
+
+## 🚀 Menjalankan Aplikasi
+
+Aplikasi ini memerlukan dua proses terminal yang berjalan secara bersamaan.
+
+**Terminal 1 (Jalankan Laravel Server):**
 ```bash
 php artisan serve
 ```
 
-**Terminal 2** (Run Asset Compilation / Vite):
+**Terminal 2 (Jalankan Kompilasi Asset / Vite):**
 ```bash
 npm run dev
 ```
 
-Access the application via browser at: **http://localhost:8000**
+Akses aplikasi melalui browser di: **http://localhost:8000**
 
 ---
 
-## 🔐 Default Credentials (Demo Access)
+## 🔐 Akses Demo & Skenario Pengujian
 
-To facilitate testing/grading, the application comes with pre-configured accounts generated by the seeder:
+Database seeder menghasilkan dataset masif (50 Proyek, ~600 Tugas, ~8.000 Komentar) untuk mensimulasikan lingkungan yang sibuk dan aktif.
 
-| Role | Email | Password | Access Level |
-|------|-------|----------|--------------|
-| **Super Admin** | admin@apexio.com | password | Full System Access (Admin Dashboard) |
-| **Regular User** | user@apexio.com | password | Project Management Only |
+### 1. Akses Admin (Untuk melihat data terisi)
+Gunakan akun ini untuk menjelajahi dashboard, mengelola pengguna, dan melihat aplikasi dengan data lengkap.
 
-> **Note:** Run `php artisan migrate:fresh --seed` to generate these accounts.
+| Peran | Email | Password | Deskripsi |
+|------|-------|----------|-----------|
+| Super Admin | admin@apexio.com | password | Akses Sistem Penuh & Tampilan Data Lengkap |
 
+### 2. Pengujian Pengguna Reguler (Direkomendasikan)
+Seeder membuat 50 "pengguna dummy" acak untuk mengisi proyek, tetapi tidak membuat akun demo pengguna khusus untuk Anda.
+
+- **Untuk Menguji Registrasi:** Silakan gunakan fitur Register dengan alamat email pribadi Anda sendiri.
+- **Untuk Menguji Lupa Password:** Setelah mendaftar, logout dan gunakan link "Lupa password?". Pastikan Anda telah mengkonfigurasi file `.env` seperti yang dijelaskan di bagian "Pengaturan Email" di atas.
+
+**Mengapa?** Ini memungkinkan Anda mengalami alur onboarding lengkap dan memverifikasi bahwa pengiriman email berfungsi dengan konfigurasi SMTP spesifik Anda.
