@@ -9,10 +9,17 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Form request untuk login pengguna.
+ * 
+ * Menangani validasi, autentikasi, dan rate limiting untuk login.
+ */
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah user berhak membuat request ini.
+     *
+     * @return bool Selalu return true karena login terbuka untuk semua
      */
     public function authorize(): bool
     {
@@ -20,9 +27,9 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Mendapatkan aturan validasi untuk request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string> Rules validasi
      */
     public function rules(): array
     {
@@ -33,9 +40,12 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Mencoba autentikasi kredensial dari request.
+     * 
+     * Cek rate limit, attempt login, dan handle failed attempts.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @return void
+     * @throws ValidationException Jika autentikasi gagal atau rate limited
      */
     public function authenticate(): void
     {
@@ -53,9 +63,12 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Ensure the login request is not rate limited.
+     * Memastikan request login tidak terkena rate limit.
+     * 
+     * Maksimal 5 percobaan login per throttle key.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @return void
+     * @throws ValidationException Jika terlalu banyak percobaan
      */
     public function ensureIsNotRateLimited(): void
     {
@@ -76,7 +89,11 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Mendapatkan rate limiting throttle key untuk request.
+     * 
+     * Key berdasarkan kombinasi email dan IP address.
+     *
+     * @return string Throttle key unik untuk user dan IP
      */
     public function throttleKey(): string
     {

@@ -12,10 +12,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+/**
+ * Controller untuk registrasi pengguna baru.
+ * 
+ * Menangani proses pendaftaran akun baru di aplikasi.
+ */
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Menampilkan halaman form registrasi.
+     *
+     * @return View Halaman view untuk form registrasi
      */
     public function create(): View
     {
@@ -23,9 +30,13 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
+     * Memproses request registrasi pengguna baru.
+     * 
+     * Validasi data, buat user baru, trigger event, dan login otomatis.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @param Request $request Request yang berisi data registrasi
+     * @return RedirectResponse Redirect ke dashboard setelah registrasi
+     * @throws \Illuminate\Validation\ValidationException Jika validasi gagal
      */
     public function store(Request $request): RedirectResponse
     {
@@ -42,7 +53,6 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
-
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));

@@ -5,10 +5,17 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
+/**
+ * Component untuk layout aplikasi utama.
+ * 
+ * Digunakan sebagai wrapper untuk halaman yang memerlukan layout app.
+ */
 class AppLayout extends Component
 {
     /**
-     * Get the view / contents that represents the component.
+     * Render view component.
+     *
+     * @return View View layout app
      */
     public function render(): View
     {

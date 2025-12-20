@@ -8,12 +8,29 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Komponen Livewire untuk menampilkan task yang assigned ke user.
+ * 
+ * Menampilkan semua task yang belum selesai (status != Done) untuk user yang login.
+ */
 class MyTasks extends Component
 {
     use WithPagination;
 
+    /**
+     * Theme pagination yang digunakan.
+     *
+     * @var string
+     */
     protected $paginationTheme = 'bootstrap';
 
+    /**
+     * Render komponen dengan list task user.
+     * 
+     * Task diurutkan berdasarkan due date dan priority.
+     *
+     * @return \Illuminate\View\View View my tasks
+     */
     #[Layout('layouts.app-with-sidebar')] 
     public function render()
     {

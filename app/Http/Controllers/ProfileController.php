@@ -10,23 +10,54 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+/**
+ * Controller untuk mengelola profil pengguna.
+ * 
+ * Menangani tampilan, update, dan penghapusan profil pengguna.
+ */
 class ProfileController extends Controller
 {
+    /**
+     * Menampilkan halaman edit profil.
+     *
+     * @param Request $request Request HTTP yang berisi user yang sedang login
+     * @return View Halaman edit profil
+     */
     public function edit(Request $request): View
     {
         return view('profile.edit', ['user' => $request->user()]);
     }
 
+    /**
+     * Menampilkan halaman edit password.
+     *
+     * @param Request $request Request HTTP yang berisi user yang sedang login
+     * @return View Halaman edit password
+     */
     public function editPassword(Request $request): View
     {
         return view('profile.password', ['user' => $request->user()]);
     }
 
+    /**
+     * Menampilkan halaman danger zone (hapus akun).
+     *
+     * @param Request $request Request HTTP yang berisi user yang sedang login
+     * @return View Halaman danger zone
+     */
     public function editDangerZone(Request $request): View
     {
         return view('profile.danger-zone', ['user' => $request->user()]);
     }
 
+    /**
+     * Update informasi profil pengguna.
+     * 
+     * Menangani update nama, email, dan avatar. Jika email berubah, reset verifikasi.
+     *
+     * @param ProfileUpdateRequest $request Request yang sudah tervalidasi
+     * @return RedirectResponse Redirect dengan status update
+     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -57,6 +88,14 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+    /**
+     * Menghapus akun pengguna secara permanen.
+     * 
+     * Validasi password, logout, hapus avatar, hapus user, dan destroy session.
+     *
+     * @param Request $request Request yang berisi password konfirmasi
+     * @return RedirectResponse Redirect ke halaman utama setelah akun dihapus
+     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
